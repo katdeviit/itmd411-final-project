@@ -1,21 +1,44 @@
 package net.katdev.itmd411.finalproject;
 
 import java.awt.*;
+import java.io.*;
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 public class DatabaseManager {
 
     public static Connection connection;
     // Code database URL
-    static final String DB_URL = "REDACTED";
+    private static String DB_URL = null;
     // Database credentials
-    static final String USER = "REDACTED", PASS = "REDACTED";
+    private static String USER = null, PASS = null;
+
+    public static void load_credentials() {
+        try (InputStream input = new FileInputStream("db_creds.properties")) {
+            Properties prop = new Properties();
+            prop.load(input);
+            DB_URL = prop.getProperty("db_url");
+            USER = prop.getProperty("user");
+            PASS = prop.getProperty("pass");
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+        if(DB_URL == null || USER == null || PASS == null) {
+            System.out.println("Failed to read database credentials! Add a db_creds.properties file with the following entries:");
+            System.out.println("db_url=...");
+            System.out.println("user=...");
+            System.out.println("pass=...");
+        }
+    }
 
     public static void connect() throws SQLException {
+        if(DB_URL == null || USER == null || PASS == null) {
+            load_credentials();
+        }
         connection = DriverManager.getConnection(DB_URL, USER, PASS);
     }
 
