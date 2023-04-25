@@ -9,6 +9,7 @@ public class LoginUI {
     public static JFrame login_ui;
 
     public static void main(String[] args) {
+        LocalCache.initCache(); // preload all data for Speed :TM:
         createLoginUI();
     }
 

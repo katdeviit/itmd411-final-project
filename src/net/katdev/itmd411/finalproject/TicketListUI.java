@@ -51,7 +51,7 @@ public class TicketListUI {
         JButton openTicketButton = new JButton("Create Ticket");
         openTicketButton.addActionListener((ActionEvent e) -> {
             System.out.println("Creating ticket.");
-            String subject = JOptionPane.showInputDialog("Enter ticket subject.");
+            String subject = JOptionPane.showInputDialog(ticket_list_ui, "Enter ticket subject.");
             if(subject != null) {
                 subject = subject.trim(); // remove whitespace at start and end. prevents making a ticket that is just whitespace.
             }
@@ -60,10 +60,14 @@ public class TicketListUI {
                 return;
             }
             // Create ticket and reload UI
-            DatabaseManager.createTicket(LocalCache.getLoggedInUser(), subject);
-            LocalCache.reload_tickets();
-            fill_tickets_table();
-            System.out.println("Ticket created.");
+            if(DatabaseManager.createTicket(LocalCache.getLoggedInUser(), subject)) {
+                LocalCache.reload_tickets();
+                fill_tickets_table();
+                System.out.println("Ticket created.");
+            } else {
+                JOptionPane.showMessageDialog(ticket_list_ui, "Ticket creation failed! See console for additional error information.");
+                System.out.println("Ticket creation failed.");
+            }
         });
         JButton refreshButton = new JButton("Refresh");
         refreshButton.addActionListener((ActionEvent e) -> {

@@ -27,6 +27,9 @@ public class DatabaseManager {
         create_users();
     }
 
+    /**
+     * Creates necessary tables in the database.
+     */
     public static void create_db_schema() {
         System.out.println("Creating DB schema (this is a one time action)...");
         try {
@@ -61,6 +64,9 @@ public class DatabaseManager {
         System.out.println("Created ticket messages table.");
     }
 
+    /**
+     * Creates some default users in the database.
+     */
     public static void create_users() {
         System.out.println("Creating users (this is a one time action)...");
         try {
@@ -80,6 +86,10 @@ public class DatabaseManager {
         System.out.println("Created users.");
     }
 
+    /**
+     * Gets all User objects from the database.
+     * @return A list of User objects.
+     */
     public static List<User> getUsers() {
         List<User> users = new ArrayList<>();
         try {
@@ -126,6 +136,10 @@ public class DatabaseManager {
         return id;
     }
 
+    /**
+     * Gets all ticket objects from the database.
+     * @return A list Ticket objects.
+     */
     public static List<Ticket> getTickets() {
         List<Ticket> tickets = new ArrayList<>();
         try {
@@ -164,6 +178,12 @@ public class DatabaseManager {
         return tickets;
     }
 
+    /**
+     * Creates a ticket in the database, if possible. It is up to the UI to handle any updating (including the local cache) after this.
+     * @param author The creator of this ticket.
+     * @param subject The subject line for this ticket.
+     * @return True if the ticket was successfully created, false if not.
+     */
     public static boolean createTicket(User author, String subject) {
         boolean success = false;
         try {
