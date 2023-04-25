@@ -2,8 +2,8 @@ package net.katdev.itmd411.finalproject;
 
 import java.awt.*;
 import java.sql.*;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -139,7 +139,7 @@ public class DatabaseManager {
             ResultSet mes_res = stmt2.executeQuery(ticketMessagesSql);
             while(mes_res.next()) {
                 int ticketId = mes_res.getInt(1);
-                Date sentAt = mes_res.getDate(2);
+                Timestamp sentAt = mes_res.getTimestamp(2);
                 int userId = res.getInt(3);
                 String content = res.getString(4);
                 Ticket.TicketMessage message = new Ticket.TicketMessage(sentAt, LocalCache.getUser(userId), content);
@@ -151,7 +151,7 @@ public class DatabaseManager {
                 int ticketNum = res.getInt(1);
                 String subject = res.getString(2);
                 int userId = res.getInt(3);
-                Date createdAt = res.getDate(4);
+                Timestamp createdAt = res.getTimestamp(4);
                 Ticket.TicketState state = Ticket.TicketState.values()[res.getInt(5)];
                 List<Ticket.TicketMessage> messages = ticketMessages.getOrDefault(ticketNum, new ArrayList<>());
                 Ticket ticket = new Ticket(ticketNum, subject, LocalCache.getUser(userId), createdAt, state, messages);
@@ -164,4 +164,20 @@ public class DatabaseManager {
         return tickets;
     }
 
+    public static boolean createTicket(User author, String subject) {
+        boolean success = false;
+        try {
+            connect();
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO `kstev_tickets` (subject,author,createdAt,state) VALUES (?,(SELECT id FROM `kstev_users` WHERE username=?),NOW(),?)");
+            stmt.setString(1, subject);
+            stmt.setString(2, author.getUsername());
+            stmt.setInt(3, Ticket.TicketState.OPEN.ordinal());
+            stmt.executeUpdate();
+            success = true;
+            connection.close();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+        return success;
+    }
 }

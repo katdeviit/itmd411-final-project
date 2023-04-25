@@ -57,13 +57,15 @@ public class LoginUI {
         fieldsPanel.add(passwordLabel);
         fieldsPanel.add(passwordField);
 
-        // Add button
+        // Add login button
         JButton loginButton = new JButton("Login");
         loginButton.addActionListener((ActionEvent e) -> {
             System.out.println("Logging in...");
+            // Set the current user if valid
             boolean isValid = LocalCache.login(usernameField.getText(), String.valueOf(passwordField.getPassword()));
             System.out.println("Valid login: " + isValid);
             if (isValid) {
+                // Open the ticket list UI
                 login_ui.dispose();
                 TicketListUI.createTicketListUI();
             } else {

@@ -4,10 +4,10 @@ import java.awt.*;
 
 public class User {
 
-    public int id;
-    public String username;
-    public boolean admin;
-    public Color userColor = Color.BLACK;
+    private int id;
+    private String username;
+    private boolean admin;
+    private Color userColor = Color.BLACK;
 
     public User(int id, String username, boolean admin) {
         this.id = id;
@@ -20,4 +20,19 @@ public class User {
         this.userColor = color;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public boolean isAdmin() {
+        return admin;
+    }
+
+    public Color getUserColor() {
+        return userColor;
+    }
 }
