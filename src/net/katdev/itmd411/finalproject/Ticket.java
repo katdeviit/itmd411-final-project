@@ -5,12 +5,12 @@ import java.util.List;
 
 public class Ticket {
 
-    public int id;
-    public String subject;
-    public User author;
-    public Date createdAt;
-    public TicketState state;
-    public List<TicketMessage> messages;
+    private int id;
+    private String subject;
+    private User author;
+    private Date createdAt;
+    private TicketState state;
+    private List<TicketMessage> messages;
 
     public Ticket(int id, String subject, User author, Date createdAt, TicketState state, List<TicketMessage> messages) {
         this.id = id;
@@ -21,11 +21,35 @@ public class Ticket {
         this.messages = messages;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getSubject() {
+        return subject;
+    }
+
+    public User getAuthor() {
+        return author;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public TicketState getState() {
+        return state;
+    }
+
+    public List<TicketMessage> getMessages() {
+        return messages;
+    }
+
     public static class TicketMessage {
 
-        public Date sentAt;
-        public User author;
-        public String content;
+        private Date sentAt;
+        private User author;
+        private String content;
 
         public TicketMessage(Date sentAt, User author, String content) {
             this.sentAt = sentAt;
@@ -33,6 +57,17 @@ public class Ticket {
             this.content = content;
         }
 
+        public Date getSentAt() {
+            return sentAt;
+        }
+
+        public User getAuthor() {
+            return author;
+        }
+
+        public String getContent() {
+            return content;
+        }
     }
 
     public enum TicketState {

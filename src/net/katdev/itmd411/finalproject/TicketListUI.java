@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class TicketListUI {
 
@@ -204,39 +203,35 @@ public class TicketListUI {
     public static Object[][] getTicketData() {
         User loggedIn = LocalCache.getLoggedInUser();
         // Sort by last update
-        Collection<Ticket> tickets = LocalCache.getTicketsForUser(loggedIn).stream().sorted((t1, t2) -> {
-            Date lastUpdate1 = t1.messages.stream().map(t -> t.sentAt).sorted((t11, t22) -> Long.valueOf(t22.getTime()).compareTo(t11.getTime())).findFirst().orElse(t1.createdAt);
-            Date lastUpdate2 = t1.messages.stream().map(t -> t.sentAt).sorted((t11, t22) -> Long.valueOf(t22.getTime()).compareTo(t11.getTime())).findFirst().orElse(t1.createdAt);
-            return Long.valueOf(lastUpdate2.getTime()).compareTo(Long.valueOf(lastUpdate1.getTime()));
-        }).collect(Collectors.toList());
+        Collection<Ticket> tickets = LocalCache.getTicketsForUser(loggedIn);
         Object[][] ticketData = new Object[tickets.size()][loggedIn.isAdmin() ? 8 : 6];
         int ticketIndex = 0;
         for(Ticket ticket : tickets) {
             JButton button = new JButton("View");
             button.addActionListener((ActionEvent e) -> {
-                System.out.println("Viewing ticket " + ticket.id + ".");
+                System.out.println("Viewing ticket " + ticket.getId() + ".");
                 TicketMessageUI.view(ticket);
             });
-            JLabel usernameLabel = new JLabel(ticket.author.getUsername());
-            usernameLabel.setForeground(ticket.author.getUserColor());
+            JLabel usernameLabel = new JLabel(ticket.getAuthor().getUsername());
+            usernameLabel.setForeground(ticket.getAuthor().getUserColor());
             List<Object> data = new ArrayList<>();
-            data.add(ticket.messages.stream().map(t -> t.sentAt).sorted((t1, t2) -> Long.valueOf(t1.getTime()).compareTo(t2.getTime())).findFirst().orElse(ticket.createdAt));
-            data.add(ticket.id);
+            data.add(ticket.getMessages().stream().map(t -> t.getSentAt()).sorted((t1, t2) -> Long.valueOf(t1.getTime()).compareTo(t2.getTime())).findFirst().orElse(ticket.getCreatedAt()));
+            data.add(ticket.getId());
             data.add(usernameLabel);
-            data.add(ticket.subject);
-            data.add(ticket.state.name());
-            data.add(ticket.createdAt);
+            data.add(ticket.getSubject());
+            data.add(ticket.getState().name());
+            data.add(ticket.getCreatedAt());
             data.add(button);
             if(loggedIn.isAdmin()) {
-                JButton stateButton = new JButton(ticket.state == Ticket.TicketState.OPEN ? "Close" : "Open");
+                JButton stateButton = new JButton(ticket.getState() == Ticket.TicketState.OPEN ? "Close" : "Open");
                 stateButton.addActionListener((ActionEvent e) -> {
-                    System.out.println("Opening/closing ticket " + ticket.id + ".");
+                    System.out.println("Opening/closing ticket " + ticket.getId() + ".");
                 });
                 data.add(stateButton);
                 JButton deleteButton = new JButton("Delete");
                 deleteButton.addActionListener((ActionEvent e) -> {
-                    System.out.println("Deleting ticket " + ticket.id + ".");
-                    int result = JOptionPane.showConfirmDialog(ticket_list_ui, "Are you sure you want to delete ticket " + ticket.id + "?");
+                    System.out.println("Deleting ticket " + ticket.getId() + ".");
+                    int result = JOptionPane.showConfirmDialog(ticket_list_ui, "Are you sure you want to delete ticket " + ticket.getId() + "?");
                     if(result != 0) {
                         System.out.println("Deletion cancelled.");
                         return;

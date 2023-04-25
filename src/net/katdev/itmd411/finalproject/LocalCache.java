@@ -25,14 +25,14 @@ public class LocalCache {
         if(tickets != null) {
             return;
         }
-        users = DatabaseManager.getUsers().stream().collect(Collectors.toMap(user -> user.id, Function.identity()));
+        users = DatabaseManager.getUsers().stream().collect(Collectors.toMap(user -> user.getId(), Function.identity()));
     }
 
     public static void ensure_tickets() {
         if(tickets != null) {
             return;
         }
-        tickets = DatabaseManager.getTickets().stream().collect(Collectors.toMap(ticket -> ticket.id, Function.identity()));
+        tickets = DatabaseManager.getTickets().stream().collect(Collectors.toMap(ticket -> ticket.getId(), Function.identity()));
     }
 
     public static void reload_tickets() {
@@ -46,7 +46,7 @@ public class LocalCache {
 
     public static Collection<Ticket> getTicketsForUser(User user) {
         ensure_tickets();
-        return tickets.values().stream().filter(ticket -> user.admin || ticket.author.id == user.id).collect(Collectors.toList());
+        return tickets.values().stream().filter(ticket -> user.isAdmin() || ticket.getAuthor().getId() == user.getId()).collect(Collectors.toList());
     }
 
     public static void initCache() {
