@@ -9,6 +9,10 @@ public class LoginUI {
     public static JFrame login_ui;
 
     public static void main(String[] args) {
+        // Change the theme to actually look good on whatever system runs it
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {}
         LocalCache.initCache(); // preload all data for Speed :TM:
         createLoginUI();
     }

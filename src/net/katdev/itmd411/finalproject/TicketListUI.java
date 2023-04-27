@@ -230,6 +230,15 @@ public class TicketListUI {
                 JButton stateButton = new JButton(ticket.getState() == Ticket.TicketState.OPEN ? "Close" : "Open");
                 stateButton.addActionListener((ActionEvent e) -> {
                     System.out.println("Opening/closing ticket " + ticket.getId() + ".");
+                    Ticket.TicketState target = ticket.getState() == Ticket.TicketState.OPEN ? Ticket.TicketState.CLOSED : Ticket.TicketState.OPEN;
+                    if(DatabaseManager.setTicketState(ticket, target)) {
+                        LocalCache.reload_tickets();
+                        fill_tickets_table();
+                        System.out.println("Ticket state is now: " + target.name() + ".");
+                    } else {
+                        JOptionPane.showMessageDialog(ticket_list_ui, "Ticket state alteration failed! See console for additional error information.");
+                        System.out.println("Ticket state alteration failed.");
+                    }
                 });
                 data.add(stateButton);
                 JButton deleteButton = new JButton("Delete");
@@ -239,6 +248,14 @@ public class TicketListUI {
                     if(result != 0) {
                         System.out.println("Deletion cancelled.");
                         return;
+                    }
+                    if(DatabaseManager.deleteTicket(ticket)) {
+                        LocalCache.reload_tickets();
+                        fill_tickets_table();
+                        System.out.println("Ticket deleted.");
+                    } else {
+                        JOptionPane.showMessageDialog(ticket_list_ui, "Ticket deletion failed! See console for additional error information.");
+                        System.out.println("Ticket deletion failed.");
                     }
                 });
                 data.add(deleteButton);

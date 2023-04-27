@@ -223,4 +223,55 @@ public class DatabaseManager {
         }
         return success;
     }
+
+    /**
+     * Sets a ticket's state in the database, if possible. It is up to the UI to handle any updating (including the local cache) after this.
+     * @param ticket The target ticket to set the state of.
+     * @param target The target state to set.
+     * @return True if a ticket was successfully updated, false if not.
+     * @return
+     */
+    public static boolean setTicketState(Ticket ticket, Ticket.TicketState target) {
+        boolean success = false;
+        try {
+            connect();
+            PreparedStatement stmt = connection.prepareStatement("UPDATE `kstev_tickets` SET `state`=? WHERE `id`=?");
+            stmt.setInt(1, target.ordinal());
+            stmt.setInt(2, ticket.getId());
+            int amount = stmt.executeUpdate();
+            if(amount > 1) {
+                System.out.println("FATAL: Somehow a ticket update statement edited more that one ticket with ID: " + ticket.getId());
+            }
+            success = amount > 0;
+            connection.close();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+        return success;
+    }
+
+    /**
+     * Deletes a ticket from the database, if possible. It is up to the UI to handle any updating (including the local cache) after this.
+     * @param ticket The target ticket to delete.
+     * @return True if a ticket was successfully deleted, false if not.
+     * @return
+     */
+    public static boolean deleteTicket(Ticket ticket) {
+        boolean success = false;
+        try {
+            connect();
+            PreparedStatement stmt = connection.prepareStatement("DELETE FROM `kstev_tickets` WHERE id=?");
+            stmt.setInt(1, ticket.getId());
+            int amount = stmt.executeUpdate();
+            if(amount > 1) {
+                System.out.println("FATAL: Somehow a delete statement deleted more that one ticket with ID: " + ticket.getId());
+            }
+            success = amount > 0;
+            connection.close();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+        return success;
+    }
+
 }
