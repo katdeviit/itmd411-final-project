@@ -297,4 +297,31 @@ public class DatabaseManager {
         }
         return success;
     }
+
+    /**
+     * Sets a ticket's subject in the database, if possible. It is up to the UI to handle any updating (including the local cache) after this.
+     * @param ticket The target ticket to set the state of.
+     * @param subject The subject to set.
+     * @return True if a ticket was successfully updated, false if not.
+     * @return
+     */
+    public static boolean setTicketSubject(Ticket ticket, String subject) {
+        boolean success = false;
+        try {
+            connect();
+            PreparedStatement stmt = connection.prepareStatement("UPDATE `kstev_tickets` SET `subject`=? WHERE `id`=?");
+            stmt.setString(1, subject);
+            stmt.setInt(2, ticket.getId());
+            int amount = stmt.executeUpdate();
+            if(amount > 1) {
+                System.out.println("FATAL: Somehow a ticket update statement edited more that one ticket with ID: " + ticket.getId());
+            }
+            success = amount > 0;
+            connection.close();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+        return success;
+    }
+
 }

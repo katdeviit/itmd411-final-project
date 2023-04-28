@@ -18,8 +18,8 @@ public class TicketListUI {
     public static JTable tickets_table;
     public static DefaultTableModel tickets_table_model;
 
-    public static final Object[] HEADERS = new Object[] {"Last Updated", "#", "Author", "Subject", "State", "Created At", ""};
-    public static final Object[] HEADERS_ADMIN = new Object[] {"Last Updated", "#", "Author", "Subject", "State", "Created At", "", "", ""};
+    public static final Object[] HEADERS = new Object[] {"Last Updated", "#", "Author", "Subject", "State", "Created At", "", ""};
+    public static final Object[] HEADERS_ADMIN = new Object[] {"Last Updated", "#", "Author", "Subject", "State", "Created At", "", "", "", ""};
     public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public static void createTicketListUI() {
@@ -163,11 +163,14 @@ public class TicketListUI {
         // Decrease width of button
         tickets_table.getColumnModel().getColumn(6).setMaxWidth(80);
         tickets_table.getColumnModel().getColumn(6).setPreferredWidth(80);
+        // Decrease width of button 2
+        tickets_table.getColumnModel().getColumn(7).setMaxWidth(80);
+        tickets_table.getColumnModel().getColumn(7).setPreferredWidth(80);
         if(loggedIn.isAdmin()) {
-            tickets_table.getColumnModel().getColumn(7).setMaxWidth(70);
-            tickets_table.getColumnModel().getColumn(7).setPreferredWidth(70);
-            tickets_table.getColumnModel().getColumn(8).setMaxWidth(80);
-            tickets_table.getColumnModel().getColumn(8).setPreferredWidth(80);
+            tickets_table.getColumnModel().getColumn(8).setMaxWidth(70);
+            tickets_table.getColumnModel().getColumn(8).setPreferredWidth(70);
+            tickets_table.getColumnModel().getColumn(9).setMaxWidth(80);
+            tickets_table.getColumnModel().getColumn(9).setPreferredWidth(80);
         }
 
         // Render dates properly
@@ -189,9 +192,10 @@ public class TicketListUI {
             return tableRenderer.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         };
         tickets_table.getColumnModel().getColumn(6).setCellRenderer(componentRenderer);
+        tickets_table.getColumnModel().getColumn(7).setCellRenderer(componentRenderer);
         if(loggedIn.isAdmin()) {
-            tickets_table.getColumnModel().getColumn(7).setCellRenderer(componentRenderer);
             tickets_table.getColumnModel().getColumn(8).setCellRenderer(componentRenderer);
+            tickets_table.getColumnModel().getColumn(9).setCellRenderer(componentRenderer);
         }
         tickets_table.getColumnModel().getColumn(2).setCellRenderer(componentRenderer);
 
@@ -208,7 +212,7 @@ public class TicketListUI {
         User loggedIn = LocalCache.getLoggedInUser();
         // Sort by last update
         Collection<Ticket> tickets = LocalCache.getTicketsForUser(loggedIn);
-        Object[][] ticketData = new Object[tickets.size()][loggedIn.isAdmin() ? 8 : 6];
+        Object[][] ticketData = new Object[tickets.size()][loggedIn.isAdmin() ? HEADERS_ADMIN.length : HEADERS.length];
         int ticketIndex = 0;
         for(Ticket ticket : tickets) {
             JButton button = new JButton("View");
@@ -226,6 +230,27 @@ public class TicketListUI {
             data.add(ticket.getState().name());
             data.add(ticket.getCreatedAt());
             data.add(button);
+            JButton editButton = new JButton("Edit");
+            editButton.addActionListener((ActionEvent e) -> {
+                System.out.println("Editing ticket " + ticket.getId() + ".");
+                String subject = JOptionPane.showInputDialog(ticket_list_ui, "Enter new ticket subject.", ticket.getSubject());
+                if(subject != null) {
+                    subject = subject.trim(); // remove whitespace at start and end. prevents making a ticket that is just whitespace.
+                }
+                if(subject == null || subject.length() <= 0) {
+                    System.out.println("Ticket edit cancelled.");
+                    return;
+                }
+                if(DatabaseManager.setTicketSubject(ticket, subject)) {
+                    LocalCache.reload_tickets();
+                    fill_tickets_table();
+                    System.out.println("Ticket subject is now: " + subject);
+                } else {
+                    JOptionPane.showMessageDialog(ticket_list_ui, "Ticket edit failed! See console for additional error information.");
+                    System.out.println("Ticket edit failed.");
+                }
+            });
+            data.add(editButton);
             if(loggedIn.isAdmin()) {
                 JButton stateButton = new JButton(ticket.getState() == Ticket.TicketState.OPEN ? "Close" : "Open");
                 stateButton.addActionListener((ActionEvent e) -> {
