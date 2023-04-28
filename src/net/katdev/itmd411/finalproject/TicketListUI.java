@@ -20,6 +20,7 @@ public class TicketListUI {
 
     public static final Object[] HEADERS = new Object[] {"Last Updated", "#", "Author", "Subject", "State", "Created At", ""};
     public static final Object[] HEADERS_ADMIN = new Object[] {"Last Updated", "#", "Author", "Subject", "State", "Created At", "", "", ""};
+    public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 
     public static void createTicketListUI() {
         if(ticket_list_ui != null) {
@@ -171,10 +172,9 @@ public class TicketListUI {
 
         // Render dates properly
         TableCellRenderer dateTimeRenderer = new DefaultTableCellRenderer() {
-            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd HH:mm");
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 if (value instanceof Date) {
-                    value = f.format(value);
+                    value = DATE_FORMAT.format(value);
                 }
                 return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             }

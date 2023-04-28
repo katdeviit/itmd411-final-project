@@ -177,8 +177,8 @@ public class DatabaseManager {
             while(mes_res.next()) {
                 int ticketId = mes_res.getInt(1);
                 Timestamp sentAt = mes_res.getTimestamp(2);
-                int userId = res.getInt(3);
-                String content = res.getString(4);
+                int userId = mes_res.getInt(3);
+                String content = mes_res.getString(4);
                 Ticket.TicketMessage message = new Ticket.TicketMessage(sentAt, LocalCache.getUser(userId), content);
                 List<Ticket.TicketMessage> ticketMessageList = ticketMessages.getOrDefault(ticketId, new ArrayList<>());
                 ticketMessageList.add(message);
@@ -274,4 +274,27 @@ public class DatabaseManager {
         return success;
     }
 
+    /**
+     * Sends a message attached to a ticket, if possible. It is up to the UI to handle any updating (including the local cache) after this.
+     * @param ticket The ticket to add the message to.
+     * @param sender The User who sent the message.
+     * @param text The message to send.
+     * @return True if the message was successfully created, false if not.
+     */
+    public static boolean sendMessage(Ticket ticket, User sender, String text) {
+        boolean success = false;
+        try {
+            connect();
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO `kstev_ticket_messages` (ticket_id,sentAt,author,content) VALUES (?,NOW(),(SELECT id FROM `kstev_users` WHERE username=?),?)");
+            stmt.setInt(1, ticket.getId());
+            stmt.setString(2, sender.getUsername());
+            stmt.setString(3, text);
+            stmt.executeUpdate();
+            success = true;
+            connection.close();
+        } catch (SQLException se) {
+            se.printStackTrace();
+        }
+        return success;
+    }
 }
