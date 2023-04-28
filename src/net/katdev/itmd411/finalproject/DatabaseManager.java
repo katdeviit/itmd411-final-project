@@ -1,5 +1,6 @@
 package net.katdev.itmd411.finalproject;
 
+import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.sql.*;
@@ -32,6 +33,7 @@ public class DatabaseManager {
             System.out.println("db_url=...");
             System.out.println("user=...");
             System.out.println("pass=...");
+            JOptionPane.showConfirmDialog(new JFrame(), "Failed to read database credentials! Add a db_creds.properties file!");
         }
     }
 
